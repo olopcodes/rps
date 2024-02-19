@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+
+  <title>Frontend Mentor | Rock, Paper, Scissors</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+
+</head>
+
+<body>
+  <div class="header-wrapper">
+    <header class="header">
+      <div class="header-score header-score-player">
+        <small>Your</small>
+        <small>Score</small>
+        <p class="player-score score">0</p>
+      </div>
+
+      <div class="header-game-tags">
+        <p class="header-game-tag">Rock</p>
+        <p class="header-game-tag">paper</p>
+        <p class="header-game-tag">Scissors</p>
+      </div>
+
+      <div class="header-score header-score-computer">
+        <small>Computer</small>
+        <small>Score</small>
+        <p class="computer-score score">0</p>
+      </div>
+    </header>
+
+  </div>
+
+  <div class="main-wrapper game-normal">
+    <main class="main">
+      <div class="game">
+        <div class="game-triangle">
+          <img src="./images/bg-triangle.svg" alt="triangle">
+        </div>
+
+        <button id="rock" class="game-btn util-flex-center">
+          <div class="game-btn-img-box util-flex-center">
+            <img src="./images/icon-rock.svg" alt="">
+          </div>
+
+        </button>
+        <button id="paper" class="game-btn util-flex-center">
+          <div class="game-btn-img-box util-flex-center">
+            <img src="./images/icon-paper.svg" alt="">
+          </div>
+
+        </button>
+        <button id="scissors" class="game-btn util-flex-center">
+          <div class="game-btn-img-box util-flex-center">
+            <img src="./images/icon-scissors.svg" alt="">
+          </div>
+
+        </button>
+
+
+
+      </div>
+
+
+    </main>
+
+    <div class="game-rule-btns">
+      <button class="game-btn-rules">
+        rules
+      </button>
+    </div>
+
+  </div>
+
+  <div class="footer-wrapper">
+    <footer>
+      <small>olopcodes &copy; 2024</small>
+    </footer>
+  </div>
+
+  <div class="modal-rules hide">
+    <div class="modal-rules-overlay">
+      <div class="modal-rules-body">
+        <h3>Rules</h3>
+        <button class="btn-close-modal">
+          <img src="./images/icon-close.svg" alt="close">
+        </button>
+        <div class="modal-rules-img-box">
+          <img src="./images/image-rules.svg" alt="">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>
