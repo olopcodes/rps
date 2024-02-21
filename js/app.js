@@ -12,41 +12,21 @@ $(document).ready(function () {
   };
 
 
-  let gameBoardHTML = `<div class="game-board">
-<div class="game-pick game-pick-user util-flex-center">
-  <button id="scissors" class="game-btn util-flex-center">
-    <div class="game-btn-img-box util-flex-center">
-      <img src="./images/icon-scissors.svg" alt="">
-    </div>
-
-  </button>
-  <h3>You Picked</h3>
-</div>
-
-<div class="game-pick game-pick-computer util-flex-center">
-  <button id="scissors" class="game-btn util-flex-center">
-    <div class="game-btn-img-box util-flex-center">
-      <img src="./images/icon-scissors.svg" alt="">
-    </div>
-
-  </button>
-  <h3>Computer picked</h3>
-</div>
-
-<div class="game-alert util-flex-center">
-  <p class="game-alert-winner winner">You win</p>
-  <button class="game-btn-rules game-btn-rules--bg">play again</button>
-</div>
-</div>`;
-
-
 
   $(gameBtn).click(function (e) {
     playerPick = $(e.target).attr('id');
     const rand = getRandomNumber();
     computerPick = getComputerPick(rand);
     const gameResult = gameLogic(playerPick, computerPick);
-    // console.log(playerPick, computerPick, gameResult, gameData);
+    const boardHTML = getGameBoardHTML(playerPick, computerPick);
+
+    const className = alertWinnerClass(gameResult);
+    const alertHTML = getGameAlertHTML(className);
+
+
+    setTimeout(function () { $(mainEl).html(boardHTML) }, 200);
+
+    setTimeout(function () { $('.game-board').append(alertHTML) }, 500)
   })
 
   $(gameRulesBtn).click(function (e) {
@@ -65,7 +45,12 @@ $(document).ready(function () {
   }
 
   function getGameData() {
-    return JSON.parse(localStorage.getItem('gameData'));
+
+    if (JSON.parse(localStorage.getItem('gameData'))) {
+      return JSON.parse(localStorage.getItem('gameData'))
+    } else {
+      return gameData
+    }
   }
 
   function getRandomNumber() {
@@ -84,6 +69,8 @@ $(document).ready(function () {
 
   function gameLogic(playerPick, computerPick) {
     let result
+    let gameData = getGameData();
+
     if (playerPick === computerPick) {
       result = 'tie.';
     } else if (
@@ -107,16 +94,15 @@ $(document).ready(function () {
   }
 
   function getScores() {
-    let data;
+    const { playerScore, computerScore } = getGameData();
 
-    if (getGameData()) {
-      data = getGameData();
-    } else {
-      data = gameData;
-      $('.player-score').text(data.playerScore);
-      $('.computer-score').text(data.computerScore);
-    }
+    renderScores(playerScore, computerScore)
 
+  }
+
+  function renderScores(playScore, compScore) {
+    $('.player-score').text(playScore);
+    $('.computer-score').text(compScore);
   }
 
   function alertWinnerClass(result) {
@@ -127,10 +113,10 @@ $(document).ready(function () {
     }
   }
 
-  function getGameBoardHTML(playerPick, computerPick, result) {
+  function getGameBoardHTML(playerPick, computerPick) {
     return `<div class="game-board">
     <div class="game-pick game-pick-user util-flex-center">
-      <button id="scissors" class="game-btn util-flex-center">
+      <button id="${playerPick}" class="game-btn util-flex-center">
         <div class="game-btn-img-box util-flex-center">
           <img src="./images/icon-${playerPick}.svg" alt="">
         </div>
@@ -140,7 +126,7 @@ $(document).ready(function () {
     </div>
     
     <div class="game-pick game-pick-computer util-flex-center">
-      <button id="scissors" class="game-btn util-flex-center">
+      <button id="${computerPick}" class="game-btn util-flex-center">
         <div class="game-btn-img-box util-flex-center">
           <img src="./images/icon-${computerPick}.svg" alt="">
         </div>
@@ -148,9 +134,7 @@ $(document).ready(function () {
       </button>
       <h3>Computer picked</h3>
     </div>
-    
-    
-    </div>`
+    </div>`;
   }
 
   function getGameAlertHTML(className) {
@@ -170,7 +154,7 @@ $(document).ready(function () {
   }
 
   (function () {
-    // setGameData();
+    setGameData(gameData);
     getScores()
   })();
 });
