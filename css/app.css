@@ -55,6 +55,7 @@ img {
 
 button {
     all: unset;
+    cursor: pointer;
 }
 
 .hide {

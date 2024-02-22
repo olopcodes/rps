@@ -26,7 +26,9 @@ $(document).ready(function () {
 
     setTimeout(function () { $(mainEl).html(boardHTML) }, 200);
 
-    setTimeout(function () { $('.game-board').append(alertHTML) }, 500)
+    setTimeout(function () { $('.game-board').append(alertHTML) }, 500);
+
+
   })
 
   $(gameRulesBtn).click(function (e) {
