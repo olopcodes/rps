@@ -1,113 +1,141 @@
-
 $(document).ready(function () {
-  const gameBtn = $('.game-btn');
-  const gameRulesBtn = $('.game-btn-rules');
-  const closeModalBtn = $('.btn-close-modal');
+  const rulesButton = $('.game-btn-rules');
+  const closeModalButton = $('.btn-close-modal');
+  const modal = $('.modal-rules');
+  const gameButtons = $('.game-btn');
+  const game = $('.game');
   const mainEl = $('.main');
-  let playerPick = '';
-  let computerPick = '';
-  const gameData = {
-    playerScore: 0,
-    computerScore: 0
+
+  const data = {
+    player: {
+      pick: '',
+      score: 0
+    },
+    computer: {
+      pick: '',
+      score: 0
+    }
   };
 
 
+  rulesButton.click(function (e) {
+    modal.removeClass('hide');
+  });
 
-  $(gameBtn).click(function (e) {
-    playerPick = $(e.target).attr('id');
-    const rand = getRandomNumber();
-    computerPick = getComputerPick(rand);
-    const gameResult = gameLogic(playerPick, computerPick);
-    const boardHTML = getGameBoardHTML(playerPick, computerPick);
+  closeModalButton.click(function (e) {
+    modal.addClass('hide');
+  });
 
-    const className = alertWinnerClass(gameResult);
-    const alertHTML = getGameAlertHTML(className);
+  gameButtons.click(function (e) {
+    const playerPick = $(e.target).attr('id');
 
+    data.player.pick = playerPick;
 
-    setTimeout(function () { $(mainEl).html(boardHTML) }, 200);
+    getComputerPick();
 
-    setTimeout(function () { $('.game-board').append(alertHTML) }, 500);
+    const result = playGameRound();
 
+    updateScores(result);
 
-  })
+    const html = getGameBoardHTML(data.player.pick, data.computer.pick);
 
-  $(gameRulesBtn).click(function (e) {
-    if ($('.modal-rules').hasClass('hide')) {
-      $('.modal-rules').removeClass('hide');
-    }
-  })
+    $(game).addClass('hide');
 
-  $(closeModalBtn).click(function (e) {
-    $('.modal-rules').addClass('hide');
-  })
+    $(mainEl).append(html);
 
+    const className = getAlertClassName(result);
 
-  function setGameData(gameData) {
-    localStorage.setItem('gameData', JSON.stringify(gameData))
+    const alertHTML = getGameAlertHTML(className, result);
+
+    setTimeout(function () { $('.game-board').append(alertHTML) }, 150);
+
+    const scores = getScores();
+
+    renderScores(scores);
+
+  });
+
+  // add event listener to something that does not exist yet
+  $(mainEl).on('click', '.play-again-btn', function (e) {
+    // const gameHTML = getGameHTML();
+    $(game).removeClass('hide');
+    $('.game-board').addClass('hide');
+  });
+
+  function randomNumber() {
+    // return a number between 1 and 3
+    return Math.floor(Math.random() * 3) + 1;
   }
 
-  function getGameData() {
-
-    if (JSON.parse(localStorage.getItem('gameData'))) {
-      return JSON.parse(localStorage.getItem('gameData'))
+  function getComputerPick() {
+    const num = randomNumber();
+    let pick = ''
+    if (num === 1) {
+      pick = 'rock';
+    } else if (num === 2) {
+      pick = 'scissors';
     } else {
-      return gameData
-    }
-  }
-
-  function getRandomNumber() {
-    return Math.floor(Math.random() * 3);
-  }
-
-  function getComputerPick(rand) {
-    if (rand === 0) {
-      return 'rock';
-    } else if (rand === 1) {
-      return 'paper'
-    } else {
-      return 'scissors'
-    }
-  }
-
-  function gameLogic(playerPick, computerPick) {
-    let result
-    let gameData = getGameData();
-
-    if (playerPick === computerPick) {
-      result = 'tie.';
-    } else if (
-      playerPick === 'rock' && computerPick === 'scissors' ||
-      playerPick === 'paper' && computerPick === 'rock' ||
-      playerPick === 'scissors' && computerPick === 'paper'
-    ) {
-      gameData.playerScore++;
-      result = 'you win!';
-    } else {
-      gameData.computerScore++
-      result = 'you lose.'
+      pick = 'paper'
     }
 
-    // store game info in local storage
-    setGameData(gameData);
+    data.computer.pick = pick;
+  }
 
-    getScores();
+  function saveScores(data) {
+    const { player, computer } = data;
 
-    return result;
+    localStorage.setItem('gameScores', JSON.stringify({
+      player: player.score,
+      computer: computer.score
+    }));
   }
 
   function getScores() {
-    const { playerScore, computerScore } = getGameData();
+    return JSON.parse(localStorage.getItem('gameScores'));
+  }
 
-    renderScores(playerScore, computerScore)
+  function playGameRound() {
+    const { player, computer } = data;
+    const playerPick = player.pick;
+    const computerPick = computer.pick;
+
+    if (playerPick === computerPick) {
+      return 'tie.'
+    } else if (
+      playerPick === 'rock' && computerPick === 'paper' ||
+      playerPick === 'scissors' && computerPick === 'rock' ||
+      playerPick === 'paper' && computerPick === 'scissors'
+    ) {
+      return 'you lose.'
+    } else {
+      return 'you win!'
+    }
 
   }
 
-  function renderScores(playScore, compScore) {
-    $('.player-score').text(playScore);
-    $('.computer-score').text(compScore);
+  function updateScores(result) {
+    const { player, computer } = data;
+
+    if (result === 'you win!') {
+      player.score++;
+    } else if (result === 'you lose.') {
+      computer.score++;
+    } else {
+      return
+    }
+
+
+    saveScores(data);
   }
 
-  function alertWinnerClass(result) {
+  function renderScores(scores) {
+    const { player, computer } = scores;
+
+    $('.player-score').text(player);
+    $('.computer-score').text(computer);
+  }
+
+  function getAlertClassName(result) {
     if (result === 'you win!') {
       return 'winner'
     } else if (result === 'you lose.') {
@@ -115,48 +143,47 @@ $(document).ready(function () {
     }
   }
 
+  function getGameAlertHTML(className, result) {
+    return `
+        <div class="game-alert util-flex-center">
+          <p class="game-alert-winner ${className}">${result}</p>
+          <button class="game-btn-rules game-btn-rules--bg play-again-btn">play again</button>
+        </div>
+        `
+  }
+
   function getGameBoardHTML(playerPick, computerPick) {
     return `<div class="game-board">
-    <div class="game-pick game-pick-user util-flex-center">
-      <button id="${playerPick}" class="game-btn util-flex-center">
-        <div class="game-btn-img-box util-flex-center">
-          <img src="./images/icon-${playerPick}.svg" alt="">
+        <div class="game-pick game-pick-user util-flex-center">
+          <button id="${playerPick}" class="game-btn util-flex-center">
+            <div class="game-btn-img-box util-flex-center">
+              <img src="./images/icon-${playerPick}.svg" alt="">
+            </div>
+        
+          </button>
+          <h3>You Picked</h3>
         </div>
-    
-      </button>
-      <h3>You Picked</h3>
-    </div>
-    
-    <div class="game-pick game-pick-computer util-flex-center">
-      <button id="${computerPick}" class="game-btn util-flex-center">
-        <div class="game-btn-img-box util-flex-center">
-          <img src="./images/icon-${computerPick}.svg" alt="">
+        
+        <div class="game-pick game-pick-computer util-flex-center">
+          <button id="${computerPick}" class="game-btn util-flex-center">
+            <div class="game-btn-img-box util-flex-center">
+              <img src="./images/icon-${computerPick}.svg" alt="">
+            </div>
+        
+          </button>
+          <h3>Computer picked</h3>
         </div>
-    
-      </button>
-      <h3>Computer picked</h3>
-    </div>
-    </div>`;
-  }
+        </div>`;
+  };
 
-  function getGameAlertHTML(className) {
-    return `
-    <div class="game-alert util-flex-center">
-      <p class="game-alert-winner ${className}">You win</p>
-      <button class="game-btn-rules game-btn-rules--bg">play again</button>
-    </div>
-    `
-  }
-  function renderGameBoard() {
-
-  }
-
-  function playGame() {
-
-  }
 
   (function () {
-    setGameData(gameData);
-    getScores()
+    const storedScores = getScores();
+
+    if (storedScores) {
+      renderScores(storedScores);
+      data.player.score = storedScores.player;
+      data.computer.score = storedScores.computer;
+    }
   })();
 });
